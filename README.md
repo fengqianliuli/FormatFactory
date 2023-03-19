@@ -9,6 +9,9 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 
 # install && run
 
+需要先安装ffmpeg依赖，根据你的操作系统对应安装即可
+https://ffmpeg.org/download.html
+
 ```bash
 npm install
 npm run dev
