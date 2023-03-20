@@ -1,20 +1,36 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron')
 const path = require('path')
 const Ffmpeg = require('fluent-ffmpeg')
 
 let win = null
 
+const menuTemplate = [
+  {
+    label: '文件',
+    role: 'fileMenu'
+  },
+  {
+    label: '关于',
+    role: 'help'
+  }
+]
+
 const createWindow = () => {
   win = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: "./src/assets/logo.png",
+    title: "格式工厂",
     webPreferences: {
       preload: path.join(__dirname, './src/preload/preload.js')
     }
   })
 
-  win.loadURL('http://localhost:5173')
+  const menu = Menu.buildFromTemplate(menuTemplate)
+  Menu.setApplicationMenu(menu)
 
+
+  win.loadURL('http://localhost:5173')
   win.webContents.openDevTools()
 }
 
