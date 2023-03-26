@@ -1,6 +1,8 @@
 <script setup>
   import { ref, reactive } from 'vue'
   import { Button, Cell, CellGroup, DropdownMenu, DropdownItem, Progress } from 'vant'
+  import StartBtn from './StartBtn.vue';
+  import Progresser from './Progresser.vue'
 
 
   const filePath = ref('')
@@ -14,6 +16,11 @@
   const convertProcess = ref(0)
   const processColor = ref('#4187f7')
 
+  // component refrences
+  const startButtonRef = ref(null)
+  const progresserRef = ref(null)
+
+
   const openFileDiag = async () => {
     filePath.value = await window.electronAPI.openFile()
   }
@@ -22,12 +29,33 @@
     dirPath.value = await window.electronAPI.openDir()
   }
 
+  const recoverBtn = () => {
+    console.log('recoverBtn')
+    if (startButtonRef.value) {
+    startButtonRef.value.reset()
+  }
+    // startButtonRef.value.reset()
+  }
+
   const startConvert = async () => {
-    if (filePath.value === '' || dirPath.value === '') {
-      alert('请选择文件和目录')
+    if (filePath.value === '' || dirPath.value === '' ) {
+      // alert('请选择文件和目录')
+      startButtonRef.value.warnDisabled()
+      console.log('请选择文件和目录')
       return
     }
+    // if (convertProcess.value > 0 && convertProcess.value < 100) {
+    //   startButtonRef.value.warnProcessing()
+    //   console.log('请稍后再试试吧')
+    //   return
+    // }
+    
+    if (startButtonRef.value) {
+      startButtonRef.value.accessClick()
+    }
+
     window.electronAPI.onProgress((precess) => {
+      console.log('precess', precess)
       convertProcess.value = precess
       if (precess === 100) {
         processColor.value = '#008000'
@@ -68,11 +96,16 @@
 
   <CellGroup inset>
     <Cell title="转换进度：">
-      <Button type="primary" @click="startConvert">开始转换</Button>
+      
     </Cell>
-    <Cell v-if="convertProcess > 0">
+    <div style="display: flex; justify-content: flex-end; overflow: hidden; ">
+      <StartBtn ref="startButtonRef" type="primary" @click="startConvert">开始转换</StartBtn>
+    </div>
+    <Progresser ref="progresserRef" :progress="parseInt(convertProcess)" :callback="recoverBtn"></Progresser>
+
+    <!-- <Cell v-if="convertProcess > 0">
       <Progress :percentage="parseInt(convertProcess)" stroke-width="12" :color=processColor> </Progress>
-    </Cell>
+    </Cell> -->
   </CellGroup>
 
 </div>
